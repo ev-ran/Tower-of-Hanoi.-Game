@@ -11,7 +11,8 @@ let firstElement;
 let secondElement;
 let firstRingWidth;
 let secondRingWidth;
-
+let numberOfDisks;
+let gameOver = false;
 
 start();
 
@@ -21,7 +22,6 @@ button_refresh.addEventListener('click', function () {
     tower_field_3.innerHTML = '';
 
     start();
-
 })
 
 button_start.addEventListener("click", function () {
@@ -29,47 +29,45 @@ button_start.addEventListener("click", function () {
     tower_field_2.innerHTML = '';
     tower_field_3.innerHTML = '';
 
-    num = input_element.value;
+    numberOfDisks = input_element.value;
+    gameOver = false;
+    countClick = 1;
 
-    if (num === '') {
+    if (numberOfDisks === '') {
         n = 10;
-    } else if (num > 100) {
+    } else if (numberOfDisks > 100) {
         n = 100;
-    } else if (num <= 1) {
+    } else if (numberOfDisks <= 1) {
         n = 3;
     } else {
-        n = num;
+        n = numberOfDisks;
     }
 
     tower = new Tower(n, tower_field_1);
     tower.createTower();
 
-
 })
 
-
 tower_field_1.addEventListener('click', function (event) {
-    if (countClick === 1) {
+    if (countClick === 1 && gameOver === false) {
         firstElement = document.getElementById(event.currentTarget.id);
         if (firstElement.childElementCount === 0) {  // if first tower is empty
             alert("This tower is empty. Choose other tower");
         } else {
-
             clickTrigger();
         }
-
     } else {  //if countClick === 2
 
         secondElement = document.getElementById(event.currentTarget.id);
 
-        myFunction();
-
+        if (gameOver === false) {
+            myFunction();
+        }
     }
 });
-
 
 tower_field_2.addEventListener('click', function (event) {
-    if (countClick === 1) {
+    if (countClick === 1 && gameOver === false) {
         firstElement = document.getElementById(event.currentTarget.id);
         if (firstElement.childElementCount === 0) {  // if first tower is empty
             alert("This tower is empty. Choose other tower");
@@ -82,15 +80,14 @@ tower_field_2.addEventListener('click', function (event) {
 
         secondElement = document.getElementById(event.currentTarget.id);
 
-        myFunction();
-
+        if (gameOver === false) {
+            myFunction();
+        }
     }
 });
-
-
 
 tower_field_3.addEventListener('click', function (event) {
-    if (countClick === 1) {
+    if (countClick === 1 && gameOver === false) {
         firstElement = document.getElementById(event.currentTarget.id);
         if (firstElement.childElementCount === 0) {  // if first tower is empty
             alert("This tower is empty. Choose other tower");
@@ -103,38 +100,37 @@ tower_field_3.addEventListener('click', function (event) {
 
         secondElement = document.getElementById(event.currentTarget.id);
 
-        myFunction();
-
+        if (gameOver === false) {
+            myFunction();
+        }
     }
 });
-
-// var timesClicked = 0;
 
 function myFunction() {
 
     firstRingWidth = firstElement.lastElementChild.clientWidth;
-    // console.log("firstRingWidth: " +firstRingWidth);
 
     if (secondElement.childElementCount > 0) {
         secondRingWidth = secondElement.lastElementChild.clientWidth;
     } else {
         secondRingWidth = 0;
     }
-    // console.log("secondRingWidth: " +secondRingWidth);
 
-    if (secondRingWidth > firstRingWidth || secondRingWidth === 0) {
+    if (secondRingWidth > firstRingWidth || secondRingWidth === 0 && gameOver === false) {
         secondElement.append(firstElement.lastElementChild);
+
+        checkWin(secondElement);
     }
 
-    countClick = 1;
-
+    if (gameOver === false) {
+        countClick = 1;
+    }
 }
 
 function clickTrigger() {
     if (countClick === 1) {
         countClick = 2;
     }
-
 }
 
 function start() {
@@ -155,4 +151,39 @@ function start() {
 function getRandom() {
     let n = Math.ceil(Math.random() * 20) + 1;
     return n;
+}
+
+function checkWin(element) {
+
+    if (element.childElementCount === Number(numberOfDisks)) {
+        gameOver = true;
+
+        var childElements = element.childNodes;
+        let array = [...childElements];
+
+        for (let i = 0; i < element.childElementCount; i++) {
+
+            winAnimation(childElements[i]);
+        }
+        return true;
+    }
+    return false;
+}
+
+function winAnimation(element) {
+    return element.animate([
+        // keyframes
+
+        { transform: 'scale(1)' },
+        { backgroundColor: 'yellow' },
+        { transform: 'scale(1.1)' },
+        { transform: 'scale(1)' },
+        { backgroundColor: 'red' },
+        { transform: 'scale(0.8)' },
+        { backgroundColor: 'blue' },
+        { transform: 'scale(1)' },
+    ], {
+        // timing options
+        duration: 1800
+    });
 }
